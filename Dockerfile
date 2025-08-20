@@ -43,16 +43,17 @@ COPY --chown=appuser:appuser . .
 # Switch to non-root user
 USER appuser
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
-
-# Expose port
-EXPOSE 8000
-
-# Set default port
+# Set default port (Cloud Run will override this)
 ENV PORT=8000
 
-# Run the application using PORT environment variable
-CMD uvicorn main:app --host 0.0.0.0 --port $PORT
+# Expose port (documentation only)
+EXPOSE 8000
+
+# Health check using the PORT variable
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/health || exit 1
+
+# Run the application
+# Use sh -c to properly expand the PORT variable
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
 
