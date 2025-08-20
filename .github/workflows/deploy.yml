@@ -62,9 +62,9 @@ jobs:
             --set-env-vars "ENVIRONMENT=production" \
             --set-env-vars "VERSION=${{ github.sha }}" \
             --set-env-vars "DEPLOYED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            --set-secrets "DATABASE_URL=database-url:latest" \
-            --set-secrets "REDIS_URL=redis-url:latest" \
-            --set-secrets "JWT_SECRET=jwt-secret:latest" \
+            --set-env-vars "DATABASE_URL=sqlite:///./chefoodai.db" \
+            --set-env-vars "JWT_SECRET=temp-secret-key-change-in-production" \
+            --set-env-vars "SECRET_KEY=temp-secret-key-change-in-production" \
             --update-labels "service=backend,environment=production"
       
       - name: Verify Deployment
