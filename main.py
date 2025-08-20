@@ -296,10 +296,13 @@ async def service_discovery():
 if __name__ == "__main__":
     import uvicorn
     
+    # Get port from environment variable (Cloud Run sets this)
+    port = int(os.getenv("PORT", 8000))
+    
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=8000,
+        port=port,
         reload=os.getenv("ENVIRONMENT", "development") == "development",
         log_config=None  # Use structlog instead
     )
