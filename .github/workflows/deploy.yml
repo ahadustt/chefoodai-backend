@@ -1,0 +1,87 @@
+name: Deploy Backend to GCP
+
+on:
+  push:
+    branches: [main]  # Only deploy from main branch
+  workflow_dispatch:    # Allow manual deployment
+
+env:
+  GCP_PROJECT: mychef-467404
+  GCP_REGION: us-central1
+  SERVICE_NAME: chefoodai-backend
+  ARTIFACT_REGISTRY: us-central1-docker.pkg.dev/mychef-467404/chefoodai
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production  # Optional: requires approval for production
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ env.GCP_PROJECT }}
+      
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev
+      
+      - name: Build and Push Docker Image
+        run: |
+          VERSION="${{ github.sha }}"
+          
+          echo "🔨 Building Backend Docker image..."
+          docker build -t ${{ env.ARTIFACT_REGISTRY }}/backend:${VERSION} \
+                      -t ${{ env.ARTIFACT_REGISTRY }}/backend:latest \
+                      .
+          
+          echo "📤 Pushing Backend Docker image..."
+          docker push ${{ env.ARTIFACT_REGISTRY }}/backend:${VERSION}
+          docker push ${{ env.ARTIFACT_REGISTRY }}/backend:latest
+      
+      - name: Deploy to Cloud Run
+        run: |
+          echo "🚀 Deploying Backend to Cloud Run..."
+          
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.ARTIFACT_REGISTRY }}/backend:${{ github.sha }} \
+            --region ${{ env.GCP_REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --min-instances 1 \
+            --max-instances 10 \
+            --cpu 2 \
+            --memory 1Gi \
+            --timeout 300 \
+            --set-env-vars "ENVIRONMENT=production" \
+            --set-env-vars "VERSION=${{ github.sha }}" \
+            --set-env-vars "DEPLOYED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --set-secrets "DATABASE_URL=database-url:latest" \
+            --set-secrets "REDIS_URL=redis-url:latest" \
+            --set-secrets "JWT_SECRET=jwt-secret:latest" \
+            --update-labels "service=backend,environment=production"
+      
+      - name: Verify Deployment
+        run: |
+          echo "✅ Verifying deployment..."
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region ${{ env.GCP_REGION }} \
+            --format 'value(status.url)')
+          
+          echo "🔗 Service URL: ${SERVICE_URL}"
+          echo "🏥 Running health check..."
+          
+          sleep 10
+          curl -f ${SERVICE_URL}/health || exit 1
+          
+          echo "✅ Backend deployed successfully!"
+          echo "📌 Version: ${{ github.sha }}"
+          echo "🔗 URL: ${SERVICE_URL}"
