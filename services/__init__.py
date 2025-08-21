@@ -3,18 +3,15 @@ ChefoodAI Services Module
 Core business logic and AI services
 """
 
-from .ai_service import ChefoodAIService, AIRequest, AIResponse, AIRequestType, AIModelType, ai_service
+from .ai_service import AIServiceClient, AIRequestType, ai_service
 from .prompt_engineering import PromptTemplates, PromptOptimizer, CuisineType, DifficultyLevel
 from .cost_optimization import CostOptimizer, CostMetrics, CostTier, cost_optimizer
 from .safety_filters import SafetyFilters, SafetyResult, SafetyLevel, safety_filters
 
 __all__ = [
     # AI Service
-    "ChefoodAIService",
-    "AIRequest", 
-    "AIResponse",
+    "AIServiceClient",
     "AIRequestType",
-    "AIModelType",
     "ai_service",
     
     # Prompt Engineering

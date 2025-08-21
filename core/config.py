@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     PORT: int = Field(default=8000, env="PORT")
     
     # Security
-    SECRET_KEY: str = Field(..., env="SECRET_KEY")
+    SECRET_KEY: str = Field(default="dev-secret-key-change-in-production", env="SECRET_KEY")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     )
     
     # Database
-    DATABASE_URL: str = Field(..., env="DATABASE_URL")
+    DATABASE_URL: str = Field(default="postgresql://user:pass@localhost/chefoodai", env="DATABASE_URL")
     DATABASE_POOL_SIZE: int = Field(default=10, env="DATABASE_POOL_SIZE")
     DATABASE_MAX_OVERFLOW: int = Field(default=20, env="DATABASE_MAX_OVERFLOW")
     DATABASE_POOL_TIMEOUT: int = Field(default=30, env="DATABASE_POOL_TIMEOUT")
@@ -85,7 +85,7 @@ class Settings(BaseSettings):
     CACHE_TTL_LONG: int = Field(default=86400, env="CACHE_TTL_LONG")  # 24 hours
     
     # File Storage
-    STORAGE_BUCKET: str = Field(..., env="STORAGE_BUCKET")
+    STORAGE_BUCKET: str = Field(default="chefoodai-storage", env="STORAGE_BUCKET")
     MAX_FILE_SIZE: int = Field(default=10 * 1024 * 1024, env="MAX_FILE_SIZE")  # 10MB
     ALLOWED_FILE_TYPES: List[str] = Field(
         default=["image/jpeg", "image/png", "image/webp", "video/mp4"],

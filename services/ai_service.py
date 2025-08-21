@@ -250,6 +250,91 @@ class AIServiceClient:
         except httpx.HTTPStatusError as e:
             logger.error("AI service returned error", status=e.response.status_code)
             raise Exception(f"AI service error: {e.response.text}")
+    
+    async def analyze_food_image(
+        self,
+        image_data: bytes,
+        analysis_focus: Optional[str] = None,
+        dietary_restrictions: Optional[List[str]] = None
+    ) -> Dict[str, Any]:
+        """Analyze a food image using the AI service"""
+        
+        try:
+            response = await self.client.post(
+                f"{self.base_url}/api/ai/image/analyze",
+                json={
+                    "image_data": image_data.hex() if image_data else None,
+                    "analysis_focus": analysis_focus,
+                    "dietary_restrictions": dietary_restrictions
+                }
+            )
+            response.raise_for_status()
+            return response.json()
+            
+        except httpx.RequestError as e:
+            logger.error("AI service request failed", error=str(e))
+            raise Exception(f"Failed to analyze image: {str(e)}")
+        except httpx.HTTPStatusError as e:
+            logger.error("AI service returned error", status=e.response.status_code)
+            raise Exception(f"AI service error: {e.response.text}")
+    
+    async def stream_cooking_guidance(
+        self,
+        question: str,
+        recipe_data: Optional[Dict[str, Any]] = None,
+        current_step: Optional[int] = None
+    ) -> AsyncGenerator[str, None]:
+        """Stream cooking guidance from the AI service"""
+        
+        try:
+            async with self.client.stream(
+                "POST",
+                f"{self.base_url}/api/ai/cooking/guidance",
+                json={
+                    "question": question,
+                    "recipe_data": recipe_data,
+                    "current_step": current_step
+                }
+            ) as response:
+                response.raise_for_status()
+                async for chunk in response.aiter_text():
+                    yield chunk
+                    
+        except httpx.RequestError as e:
+            logger.error("AI service request failed", error=str(e))
+            yield f"Error: Failed to get guidance - {str(e)}"
+        except httpx.HTTPStatusError as e:
+            logger.error("AI service returned error", status=e.response.status_code)
+            yield f"Error: AI service error - {e.response.text}"
+    
+    async def generate_meal_plan_name(
+        self,
+        duration_days: int,
+        theme: Optional[str] = None,
+        dietary_restrictions: Optional[List[str]] = None,
+        preferences: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """Generate a creative meal plan name using the AI service"""
+        
+        try:
+            response = await self.client.post(
+                f"{self.base_url}/api/ai/meal-plan/name",
+                json={
+                    "duration_days": duration_days,
+                    "theme": theme,
+                    "dietary_restrictions": dietary_restrictions,
+                    "preferences": preferences
+                }
+            )
+            response.raise_for_status()
+            return response.json()
+            
+        except httpx.RequestError as e:
+            logger.error("AI service request failed", error=str(e))
+            raise Exception(f"Failed to generate meal plan name: {str(e)}")
+        except httpx.HTTPStatusError as e:
+            logger.error("AI service returned error", status=e.response.status_code)
+            raise Exception(f"AI service error: {e.response.text}")
 
 
 # Global AI service client instance
