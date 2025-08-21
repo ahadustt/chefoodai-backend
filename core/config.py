@@ -100,6 +100,14 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = Field(default="INFO", env="LOG_LEVEL")
     LOG_FORMAT: str = Field(default="json", env="LOG_FORMAT")
     
+    # Email Configuration
+    SMTP_SERVER: str = Field(default="smtp.gmail.com", env="SMTP_SERVER")
+    SMTP_PORT: int = Field(default=587, env="SMTP_PORT")
+    SMTP_USERNAME: str = Field(default="", env="SMTP_USERNAME")
+    SMTP_PASSWORD: str = Field(default="", env="SMTP_PASSWORD")
+    FROM_EMAIL: str = Field(default="noreply@chefoodai.com", env="FROM_EMAIL")
+    FROM_NAME: str = Field(default="ChefoodAI", env="FROM_NAME")
+    
     # External APIs
     NUTRITION_API_KEY: Optional[str] = Field(default=None, env="NUTRITION_API_KEY")
     GROCERY_API_KEY: Optional[str] = Field(default=None, env="GROCERY_API_KEY")
