@@ -82,10 +82,11 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Security Middleware - Always enable to handle Cloud Run deployments
+# Security Middleware - Configure for Cloud Run
+# Include wildcard * to allow Cloud Run's internal health checks
 app.add_middleware(
     TrustedHostMiddleware, 
-    allowed_hosts=settings.ALLOWED_HOSTS + ["*.a.run.app", "*.run.app"]
+    allowed_hosts=["*"]  # Allow all hosts for Cloud Run compatibility
 )
 
 # CORS Middleware
