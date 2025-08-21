@@ -104,7 +104,7 @@ async def get_shopping_lists(
 
 @router.get("/{shopping_list_id}", response_model=dict)
 async def get_shopping_list(
-    shopping_list_id: str = Path(..., description="Shopping list ID"),
+    shopping_list_id: str,
     current_user: CurrentUser,
     db: Session = Depends(get_db)
 ):
@@ -194,7 +194,7 @@ async def get_shopping_list(
 
 @router.delete("/{shopping_list_id}", response_model=dict)
 async def delete_shopping_list(
-    shopping_list_id: str = Path(..., description="Shopping list ID"),
+    shopping_list_id: str,
     current_user: CurrentUser,
     db: Session = Depends(get_db)
 ):
@@ -239,13 +239,13 @@ async def delete_shopping_list(
 
 @router.put("/{shopping_list_id}/items/{item_id}")
 async def update_shopping_list_item(
-    shopping_list_id: str = Path(..., description="Shopping list ID"),
-    item_id: str = Path(..., description="Item ID"),
+    shopping_list_id: str,
+    item_id: str,
+    current_user: CurrentUser,
     is_purchased: Optional[bool] = None,
     quantity: Optional[float] = None,
     unit: Optional[str] = None,
     notes: Optional[str] = None,
-    current_user: CurrentUser,
     db: Session = Depends(get_db)
 ):
     """
@@ -369,10 +369,10 @@ async def update_shopping_list_item(
 @router.post("/generate")
 async def generate_ai_enhanced_shopping_list(
     meal_plan_id: str,
+    current_user: CurrentUser,
     name: Optional[str] = None,
     use_ai_enhancement: bool = Query(True, description="Use AI enhancement for better categorization"),
     optimization_level: Optional[str] = Query(None, description="Override optimization level (basic/standard/premium)"),
-    current_user: CurrentUser,
     db: Session = Depends(get_db)
 ):
     """
