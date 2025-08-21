@@ -180,8 +180,8 @@ async def create_meal_plan_blazing_fast_endpoint(
 @router.get("/", response_model=MealPlanListResponse)
 async def get_user_meal_plans(
     current_user: CurrentUser,
-    db: Session = Depends(get_db),
     pagination: PaginationParams,
+    db: Session = Depends(get_db),
     status_filter: Optional[str] = Query(None, description="Filter by status"),
     goal_filter: Optional[str] = Query(None, description="Filter by goal"),
 ):
@@ -223,8 +223,8 @@ async def get_user_meal_plans(
 
 @router.get("/{plan_id}", response_model=MealPlanResponse)
 async def get_meal_plan(
-    plan_id: int = Path(..., description="Meal plan ID"),
-    current_user: CurrentUser = Depends(),
+    plan_id: int,
+    current_user: CurrentUser,
     db: Session = Depends(get_db),
     include_analytics: bool = Query(False, description="Include nutritional analytics")
 ):
@@ -270,9 +270,9 @@ async def get_meal_plan(
 
 @router.put("/{plan_id}", response_model=MealPlanResponse)
 async def update_meal_plan(
-    plan_id: int = Path(..., description="Meal plan ID"),
+    plan_id: int,
+    current_user: CurrentUser,
     updates: MealPlanUpdate = None,
-    current_user: CurrentUser = Depends(),
     db: Session = Depends(get_db)
 ):
     """
@@ -312,8 +312,8 @@ async def update_meal_plan(
 
 @router.delete("/{plan_id}")
 async def delete_meal_plan(
-    plan_id: int = Path(..., description="Meal plan ID"),
-    current_user: CurrentUser = Depends(),
+    plan_id: int,
+    current_user: CurrentUser,
     db: Session = Depends(get_db)
 ):
     """
@@ -366,8 +366,8 @@ async def delete_meal_plan(
 
 @router.post("/{plan_id}/restore")
 async def restore_meal_plan(
-    plan_id: int = Path(..., description="Meal plan ID"),
-    current_user: CurrentUser = Depends(),
+    plan_id: int,
+    current_user: CurrentUser,
     db: Session = Depends(get_db)
 ):
     """
@@ -413,8 +413,8 @@ async def restore_meal_plan(
 
 @router.delete("/recipes/{recipe_id}/with-meal-plan-updates")
 async def delete_recipe_with_meal_plan_updates(
-    recipe_id: str = Path(..., description="Recipe ID"),
-    current_user: CurrentUser = Depends(),
+    recipe_id: str,
+    current_user: CurrentUser,
     db: Session = Depends(get_db)
 ):
     """
@@ -468,9 +468,9 @@ async def delete_recipe_with_meal_plan_updates(
 
 @router.post("/{plan_id}/regenerate-day")
 async def regenerate_meal_plan_day(
-    plan_id: int = Path(..., description="Meal plan ID"),
+    plan_id: int,
+    current_user: PremiumUser,
     target_date: date = Query(..., description="Date to regenerate"),
-    current_user: PremiumUser = Depends(),
     db: Session = Depends(get_db),
     _quota_check: None = Depends(check_ai_quota)
 ):
@@ -512,10 +512,10 @@ async def regenerate_meal_plan_day(
 
 @router.post("/{plan_id}/meals/{meal_id}/swap")
 async def swap_meal(
-    plan_id: int = Path(..., description="Meal plan ID"),
-    meal_id: int = Path(..., description="Meal ID"),
+    plan_id: int,
+    meal_id: int,
+    current_user: PremiumUser,
     swap_request: MealSwapRequest = None,
-    current_user: PremiumUser = Depends(),
     db: Session = Depends(get_db),
     _quota_check: None = Depends(check_ai_quota)
 ):
@@ -559,8 +559,8 @@ async def swap_meal(
 
 @router.get("/{plan_id}/shopping-list", response_model=ShoppingListResponse)
 async def get_shopping_list(
-    plan_id: int = Path(..., description="Meal plan ID"),
-    current_user: CurrentUser = Depends(),
+    plan_id: int,
+    current_user: CurrentUser,
     db: Session = Depends(get_db),
     week_number: Optional[int] = Query(None, description="Specific week number"),
     optimize_layout: bool = Query(True, description="Optimize for store layout")
@@ -609,8 +609,8 @@ async def get_shopping_list(
 
 @router.get("/{plan_id}/nutrition-analysis", response_model=NutritionAnalysisResponse)
 async def get_nutrition_analysis(
-    plan_id: int = Path(..., description="Meal plan ID"),
-    current_user: PremiumUser = Depends(),
+    plan_id: int,
+    current_user: PremiumUser,
     db: Session = Depends(get_db)
 ):
     """
@@ -667,9 +667,9 @@ async def get_nutrition_analysis(
 
 @router.post("/{plan_id}/feedback")
 async def submit_meal_plan_feedback(
-    plan_id: int = Path(..., description="Meal plan ID"),
+    plan_id: int,
+    current_user: CurrentUser,
     feedback: MealPlanFeedbackCreate = None,
-    current_user: CurrentUser = Depends(),
     db: Session = Depends(get_db)
 ):
     """
@@ -696,7 +696,7 @@ async def submit_meal_plan_feedback(
 
 @router.get("/templates/", response_model=List[MealPlanTemplateResponse])
 async def get_meal_plan_templates(
-    current_user: CurrentUser = Depends(),
+    current_user: CurrentUser,
     db: Session = Depends(get_db),
     category: Optional[str] = Query(None, description="Filter by category"),
     difficulty: Optional[str] = Query(None, description="Filter by difficulty")
@@ -725,9 +725,9 @@ async def get_meal_plan_templates(
 
 @router.post("/templates/{template_id}/use")
 async def use_meal_plan_template(
-    template_id: int = Path(..., description="Template ID"),
+    template_id: int,
+    current_user: CurrentUser,
     customizations: Optional[Dict[str, Any]] = None,
-    current_user: CurrentUser = Depends(),
     db: Session = Depends(get_db),
     _quota_check: None = Depends(check_ai_quota)
 ):
