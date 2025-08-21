@@ -43,7 +43,7 @@ class Settings(BaseSettings):
         env="CORS_ORIGINS"
     )
     ALLOWED_HOSTS: List[str] = Field(
-        default=["localhost", "127.0.0.1", "chefoodai-backend-1074761757006.us-central1.run.app", "*.run.app"],
+        default=["localhost", "127.0.0.1", "chefoodai-backend-mpsrniojta-uc.a.run.app", "*.run.app"],
         env="ALLOWED_HOSTS"
     )
     
