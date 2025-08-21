@@ -66,6 +66,7 @@ jobs:
             --set-secrets "REDIS_URL=redis-url:latest" \
             --set-secrets "JWT_SECRET=jwt-secret:latest" \
             --set-secrets "SECRET_KEY=secret-key:latest" \
+            --set-secrets "STORAGE_BUCKET=storage-bucket:latest" \
             --update-labels "service=backend,environment=production"
       
       - name: Verify Deployment
