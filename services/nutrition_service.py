@@ -50,6 +50,9 @@ class NutritionalProfile:
     phosphorus: float = 0.0
     potassium: float = 0.0
     zinc: float = 0.0
+    copper: float = 0.0
+    manganese: float = 0.0
+    selenium: float = 0.0
     
     # Additional metrics
     glycemic_index: Optional[float] = None
