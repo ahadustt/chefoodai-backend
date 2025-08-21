@@ -181,7 +181,7 @@ async def create_meal_plan_blazing_fast_endpoint(
 async def get_user_meal_plans(
     current_user: CurrentUser,
     db: Session = Depends(get_db),
-    pagination: PaginationParams = Depends(),
+    pagination: PaginationParams,
     status_filter: Optional[str] = Query(None, description="Filter by status"),
     goal_filter: Optional[str] = Query(None, description="Filter by goal"),
 ):
