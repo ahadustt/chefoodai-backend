@@ -11,8 +11,7 @@ alembic==1.12.1
 psycopg2-binary==2.9.9
 
 # Redis & Caching
-redis==5.0.1
-aioredis==2.0.1
+redis[hiredis]==5.0.1
 
 # Authentication & Security
 passlib[bcrypt]==1.7.4

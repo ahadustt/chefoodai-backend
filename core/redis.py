@@ -4,9 +4,9 @@ Async Redis setup for caching, sessions, and rate limiting
 """
 
 try:
-    import aioredis
+    from redis import asyncio as redis_async
 except ImportError:
-    aioredis = None
+    redis_async = None
 import json
 import pickle
 import structlog
@@ -26,12 +26,12 @@ async def init_redis() -> None:
     """Initialize Redis connection pool"""
     global redis_pool
     
-    if aioredis is None:
-        logger.warning("aioredis not available - Redis functionality disabled")
+    if redis_async is None:
+        logger.warning("redis async not available - Redis functionality disabled")
         return
     
     try:
-        redis_pool = aioredis.ConnectionPool.from_url(
+        redis_pool = redis_async.ConnectionPool.from_url(
             settings.REDIS_URL,
             max_connections=settings.REDIS_POOL_SIZE,
             retry_on_timeout=True,
@@ -40,7 +40,7 @@ async def init_redis() -> None:
         )
         
         # Test connection
-        redis = aioredis.Redis(connection_pool=redis_pool)
+        redis = redis_async.Redis(connection_pool=redis_pool)
         await redis.ping()
         await redis.close()
         
@@ -63,15 +63,15 @@ async def close_redis() -> None:
 @asynccontextmanager
 async def get_redis():
     """Get Redis connection from pool"""
-    if aioredis is None:
-        logger.warning("aioredis not available - returning None")
+    if redis_async is None:
+        logger.warning("redis async not available - returning None")
         yield None
         return
         
     if not redis_pool:
         raise RuntimeError("Redis not initialized. Call init_redis() first.")
     
-    redis = aioredis.Redis(connection_pool=redis_pool)
+    redis = redis_async.Redis(connection_pool=redis_pool)
     try:
         yield redis
     finally:
