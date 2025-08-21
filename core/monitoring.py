@@ -6,6 +6,7 @@ Comprehensive monitoring, metrics, and tracing for production deployment
 import time
 import logging
 import functools
+import asyncio
 from typing import Dict, List, Optional, Any, Callable
 from contextlib import contextmanager
 from datetime import datetime, timedelta
@@ -367,7 +368,7 @@ def monitor_ai_request(model_name: str, request_type: str):
                 
                 return result
                 
-            except TimeoutError:
+            except asyncio.TimeoutError:
                 ai_requests_timeout_total.labels(model=model_name).inc()
                 ai_requests_total.labels(
                     model=model_name,
