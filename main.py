@@ -82,17 +82,16 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Security Middleware
-if os.getenv("ENVIRONMENT") == "production":
-    app.add_middleware(
-        TrustedHostMiddleware, 
-        allowed_hosts=os.getenv("ALLOWED_HOSTS", "localhost,*.chefoodai.com").split(",")
-    )
+# Security Middleware - Always enable to handle Cloud Run deployments
+app.add_middleware(
+    TrustedHostMiddleware, 
+    allowed_hosts=settings.ALLOWED_HOSTS + ["*.a.run.app", "*.run.app"]
+)
 
 # CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:3000,http://frontend:3000").split(","),
+    allow_origins=settings.CORS_ORIGINS + ["https://*.a.run.app", "https://*.run.app"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
