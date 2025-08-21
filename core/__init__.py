@@ -3,7 +3,7 @@ ChefoodAI Core Module
 Central configuration and utilities
 """
 
-from .config_simple import settings
+from .config import settings
 from .database import Base, get_db, get_db_session, init_db, close_db
 # from .redis import cache, rate_limiter, session_manager, init_redis, close_redis
 

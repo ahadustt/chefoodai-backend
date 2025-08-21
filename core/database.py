@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 import structlog
 from typing import AsyncGenerator
 
-from core.config_simple import settings
+from core.config import settings
 
 logger = structlog.get_logger()
 
